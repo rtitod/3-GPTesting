@@ -15,7 +15,6 @@ Ejemplo: \edit_cmd 3 nmap -p20-1200 $ip
 Ejemplo: \list_cmd
 
 
-
 <b><u>Comandos relacionados al escaneo de un host o ip y a la generación de informes</u></b>
 
 <b>\scan $IP:</b>    Este comando le permite escanear una dirección IP o host usando las herramientas referenciadas por \list_cmd. 
