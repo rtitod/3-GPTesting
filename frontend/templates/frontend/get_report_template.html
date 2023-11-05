@@ -1,0 +1,49 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="es">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Resumen Ejecutivo</title>
+</head>
+
+<body>
+
+<p><b><font size="6">Resumen Ejecutivo:</font></b></p>
+<p>{{ nombre }} ha sido contratado por {{ empresa }} para llevar a cabo una 
+prueba de penetración con el fin de determinar su exposición a un ataque 
+dirigido. Todas las actividades se realizaron de manera que simulaba a un actor 
+malicioso comprometido en un ataque dirigido contra {{ empresa }}, con los 
+siguientes objetivos:<br>
+<br>
+Identificar si un atacante remoto podría penetrar las defensas de&nbsp; {{ empresa }}.<br>
+Determinar el impacto de una violación de seguridad en:</p>
+<ul>
+	<li>La confidencialidad de los datos privados de la empresa.</li>
+	<li>La infraestructura interna y la disponibilidad de los sistemas de 
+	información de&nbsp; {{ empresa }}.</li>
+</ul>
+<p>Los esfuerzos se centraron en la identificación y explotación de debilidades 
+de seguridad que podrían permitir a un atacante remoto acceder sin autorización 
+a los datos de la organización. Los ataques se llevaron a cabo con el nivel de 
+acceso que tendría un usuario general de Internet. La evaluación se realizó de 
+acuerdo con las recomendaciones establecidas en el NIST SP 800-1151, y todas las 
+pruebas y acciones se llevaron a cabo en condiciones controladas.</p>
+<p><b><font size="6">Resumen de los Resultados:</font></b></p>
+<p>{{ resumen }}</p>
+<p><font size="6"><b>Narrativa de Ataque</b></font><b><font size="6">:</font></b></p>
+{% for contenedor, respuesta in contenedores_y_respuestas %}
+<p>{{ contenedor | safe }}</p>
+<p>{{ respuesta | safe}}</p>
+{% endfor %}
+<p><b><font size="6">Resultados:</font></b></p>
+<p>{{ resultado |safe }}</p>
+<p><b><font size="6">Recomendaciones:</font></b></p>
+<p>{{ recomendaciones |safe }}</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

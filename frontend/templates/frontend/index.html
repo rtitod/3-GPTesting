@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3GPTesting</title>
+</head>
+<body>
+    <div id="chat">
+        <div id="mensajes"></div>
+        <textarea id="mensaje" rows="5" cols="120"></textarea>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <div id="loading"></div>
+        <button id="enviar">Enviar</button>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+
+            function cargarMensajes() {
+               $.ajax({
+                    url: '/recuperar_mensajes/',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#mensajes').empty();
+                        data.forEach(function(mensaje) {
+                            $('#mensajes')
+                            .append('<p><br>' + '<b>' + mensaje.fecha + '</b>'
+                                + '<br>' + '<u>' + mensaje.mensaje + '</u>'
+                                + '<br>' + mensaje.respuesta + '</p>');
+                        })
+                        $('#enviar').prop('disabled', false);
+                        $('#mensaje').prop('disabled', false);
+                        $('html, body').animate({ scrollTop: $(document).height() }, 'slow');
+                    }
+                });
+            }
+            
+            $('#enviar').click(function() {
+                enviarMensaje();
+            });
+
+            $('#mensaje').keydown(function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault(); // Evitar que el formulario se envíe automáticamente
+                    enviarMensaje();
+                }
+            });
+
+            function enviarMensaje() {
+                var contenido = $('#mensaje').val();
+
+                if (contenido.trim() !== '') {
+                    $('#enviar').prop('disabled', true);
+                    $('#mensaje').val('Procesando, espere por favor. Si demora la respuesta, recarge esta página.');
+                    $('#mensaje').prop('disabled', true); 
+                    $.ajax({
+                    url: '/enviar_mensaje/',
+                    method: 'POST',
+                    data: {
+                        'contenido': contenido,                 
+                        'csrfmiddlewaretoken': csrf_token,
+                    },
+                    success: function(data) {
+                        cargarMensajes();
+                        $('#mensaje').val(''); // Limpiar el contenido del textbox
+                    }
+                });
+                }
+            }
+    
+            cargarMensajes();
+        });
+    </script>
+    
+</body>
+</html>
