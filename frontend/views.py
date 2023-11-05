@@ -135,13 +135,9 @@ def add_cmd(comando):
                 if "$ip" in comando[i]:
                     existeip = True
             if existeip:
-                existecomando = Linea_Comando.objects.filter(comando=comando[1])
-                if not existecomando:
-                    comando[2] = ' '.join(comando[2:])
-                    Linea_Comando.objects.create(comando=comando[1],parametros=comando[2])
-                    response_content = "Comando añadido correctamente"
-                else:
-                    response_content = "El comando ya existe en la base de datos"
+                comando[2] = ' '.join(comando[2:])
+                Linea_Comando.objects.create(comando=comando[1],parametros=comando[2])
+                response_content = "Comando añadido correctamente"
             else:
                 response_content = "No existe el parámetro $ip"
         except Exception as e:
@@ -153,40 +149,48 @@ def add_cmd(comando):
 def del_cmd(comando):
     if len(comando) == 2:
         try:
-            objetos_a_eliminar = Linea_Comando.objects.filter(comando=comando[1])
-            if objetos_a_eliminar:
-                objetos_a_eliminar.delete()
-                response_content = "Comando borrado correctamente"
-            else:
-                response_content = "No existe ese comando para editar"
+            objeto = Linea_Comando.objects.get(id=comando[1])
+        except Linea_Comando.DoesNotExist:
+            response_content = "No existe una linea de comandos con el id " + str(comando[1]) + " para eliminar"
+        except ValueError:
+            response_content = "No existe una linea de comandos con el id " + str(comando[1]) + " para eliminar"
         except Exception as e:
             response_content = "Ocurrió un error inesperado: " +str(e)
+        else:
+            objeto.delete()
+            response_content = "Comando borrado correctamente"
     else:
-        response_content = "Uso: \\del_cmd nombre_del_comando"
+        response_content = "Uso: \\del_cmd id"
     return response_content
 
 def edit_cmd(comando):
-    if len(comando) >= 3:
+    if len(comando) >= 4:
         try:
             existeip = False
-            for i in range(2, len(comando)):
+            for i in range(3, len(comando)):
                 if "$ip" in comando[i]:
                     existeip = True
             if existeip:
-                existecomando = Linea_Comando.objects.filter(comando=comando[1])
-                if existecomando:
-                    comando[2] = ' '.join(comando[2:])
-                    existecomando.delete()
-                    Linea_Comando.objects.create(comando=comando[1],parametros=comando[2])
-                    response_content = "Comando editado correctamente"
+                try:
+                    objeto = Linea_Comando.objects.get(id=comando[1])
+                except Linea_Comando.DoesNotExist:
+                    response_content = "No existe una linea de comandos con el id " + str(comando[1]) + " para editar"
+                except ValueError:
+                    response_content = "No existe una linea de comandos con el id " + str(comando[1]) + " para editar"
+                except Exception as e:
+                    response_content = "Ocurrió un error inesperado: " +str(e)
                 else:
-                    response_content = "El comando no existe en la base de datos"
+                    comando[3] = ' '.join(comando[3:])
+                    setattr(objeto, "comando", comando[2])
+                    setattr(objeto, "parametros", comando[3])
+                    objeto.save()
+                    response_content = "Comando editado correctamente"
             else:
                 response_content = "No existe el parámetro $ip"
         except Exception as e:
             response_content = "Ocurrió un error inesperado: " +str(e)
     else:
-        response_content = "Uso: \\edit_cmd nombre_del_comando (parametros incluyendo $ip)"
+        response_content = "Uso: \\edit_cmd id nombre_del_comando (parametros incluyendo $ip)"
     return response_content
 
 def list_cmd(comando):
@@ -195,12 +199,13 @@ def list_cmd(comando):
             objetos_linea_comando = Linea_Comando.objects.all()
             if objetos_linea_comando.exists():
                 tabla_html = "<table class=\"table_commands\">"
-                tabla_html += "<tr><th>Comando</th><th>Parámetros</th></tr>"
+                tabla_html += "<tr><th>Id</th><th>Comando</th><th>Parámetros</th></tr>"
 
                 for objeto in objetos_linea_comando:
+                    obj_id = objeto.id
                     obj_comando = objeto.comando
                     obj_parametros = objeto.parametros
-                    tabla_html += f"<tr><td>{obj_comando}</td><td>{obj_parametros}</td></tr>"
+                    tabla_html += f"<tr><td>{obj_id}</td><td>{obj_comando}</td><td>{obj_parametros}</td></tr>"
                 tabla_html += "</table>"
                 response_content = tabla_html
             else:

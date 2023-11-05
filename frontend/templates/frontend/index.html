@@ -25,8 +25,8 @@
                         $('#mensajes').empty();
                         data.forEach(function(mensaje) {
                             $('#mensajes')
-                            .append('<p><br>' + '<b>' + mensaje.fecha + '</b>'
-                                + '<br>' + '<u>' + mensaje.mensaje + '</u>'
+                            .append('<p><br>' + '<u><b>' + mensaje.fecha + '</b></u>'
+                                + '<br>' + '<b><i>' + mensaje.mensaje + '</i></b>'
                                 + '<br>' + mensaje.respuesta + '</p>');
                         })
                         $('#enviar').prop('disabled', false);

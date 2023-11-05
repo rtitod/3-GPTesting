@@ -4,12 +4,12 @@
 Debe incluir el string $ip que será el valor que 3GPTesting reemplazará a la hora del escaneo con la ip o el host objetivo.
 Ejemplo: \add_cmd nmap -p20-200 $ip
 
-<b>\del_cmd nombre_del_comando:</b>    Este comando le permite eliminar una linea de comandos especificando el nombre del programa.
-Ejemplo: \del_cmd nmap
+<b>\del_cmd id:</b>    Este comando le permite eliminar una linea de comandos especificando el id de la linea de comandos.
+Ejemplo: \del_cmd 3
 
-<b>\edit_cmd nombre_del_comando (parametros incluyendo $ip):</b>    Este comando le permite editar una linea de comandos existente. 
+<b>\edit_cmd id nombre_del_comando (parametros incluyendo $ip):</b>    Este comando le permite editar una linea de comandos existente. 
 Debe incluir el string $ip que será el valor que 3GPTesting reemplazará a la hora del escaneo con la ip o el host objetivo.
-Ejemplo: \edit_cmd nmap -p20-1200 $ip
+Ejemplo: \edit_cmd 3 nmap -p20-1200 $ip
 
 <b>\list_cmd:</b>    Este comando le permite listar los comandos guardados de las herramientas.
 Ejemplo: \list_cmd
