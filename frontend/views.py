@@ -11,12 +11,13 @@ import openai
 import socket
 import subprocess
 import time
+import re
 
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Mensaje, Linea_Comando, Registro_IP
 
-openai.api_key = "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"
+openai.api_key = "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"
 messages = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting."},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
@@ -73,6 +74,13 @@ def enviar_mensaje(request):
             else:
                 messages[-1]["content"] = contenido
                 response_content = get_model_response(messages, contenido)
+                if isinstance(response_content, dict) and "error" in response_content:
+                    contenido = contenido.replace('\n', '<br>')
+                    response_content = str(response_content).replace('\n', '<br>')
+                    mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
+                    return JsonResponse({'mensaje': mensaje.contenido, 
+                                        'respuesta': mensaje.respuesta, 
+                                        'fecha': mensaje.fecha.strftime('%Y-%m-%d %H:%M:%S')})
             contenido = contenido.replace('\n', '<br>')
             response_content = response_content.replace('\n', '<br>')
             mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
@@ -231,7 +239,7 @@ def scan(comando):
                         setattr(registro_ip, f"contenedor{i}", salida)
                         messages_report_expert[-1]["content"] = salida
                         respuesta = get_model_response(messages_report_expert, salida)
-                        if "error" in respuesta:
+                        if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         setattr(registro_ip, f"respuesta{i}", respuesta)
                         time.sleep(2)
@@ -274,32 +282,30 @@ def list(comando):
 
 def add(comando):
     if len(comando) >= 4:
-        if comando[2].startswith("[") and comando[2].endswith("]"):
+        input_string = ' '.join(comando)
+        patron = r'\b\w+\s+\w+\s+\[(.*?)\]\s(.*)'
+        coincidencias = re.findall(patron, input_string)
+        if coincidencias:
             try:
-                id_a_buscar = int(comando[1]) 
+                objeto = Registro_IP.objects.get(id=comando[1])
+            except Registro_IP.DoesNotExist:
+                response_content = "No se encontró un objeto con ID " + comando[1]
             except ValueError:
                 response_content = "No se encontró un objeto con ID " + comando[1]
             except Exception as e:
                 response_content = "Ocurrió un error inesperado: " +str(e)
             else:
                 try:
-                    objeto = Registro_IP.objects.get(id=id_a_buscar)
-                except Registro_IP.DoesNotExist:
-                    response_content = "No se encontró un objeto con ID " + str(id_a_buscar)
-                except Exception as e:
-                    response_content = "Ocurrió un error inesperado: " +str(e)
-                else:
                     contenedor_atributos = [nombre_atributo for nombre_atributo in dir(objeto) if nombre_atributo.startswith("contenedor")]
                     contenedor_atributos_ordenados = sorted(contenedor_atributos, key=lambda x: int(x.lstrip("contenedor")))
                     contenedor_vacio_encontrado = False
                     for atributo in contenedor_atributos_ordenados:
                         if not getattr(objeto, atributo):
-                            comando[3] = ' '.join(comando[3:])
-                            salida = comando[2] + ":\n" + comando[3]
+                            salida = "[" + coincidencias[0][0] + "]" + ":\n" + coincidencias[0][1]
                             setattr(objeto, atributo, salida)
                             messages_report_expert[-1]["content"] = salida
                             respuesta = get_model_response(messages_report_expert, salida)
-                            if "error" in respuesta:
+                            if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
                             numero = atributo.lstrip("contenedor")
                             setattr(objeto, "respuesta" + numero, respuesta)
@@ -309,83 +315,81 @@ def add(comando):
                             break
                     if not contenedor_vacio_encontrado:
                         response_content = "No se encontró algún contenedor de información vacío"
+                except Exception as e:
+                    response_content = "Ocurrió un error inesperado: " +str(e)
         else:
-            response_content = "El parametro \"linea de comandos\" no cumple con estar delimitado por: [ ]" 
+            response_content = "El parametro \"linea de comandos\" no cumple con estar delimitado por: [ ] o no existe el (segundo parametro)" 
     else:
-        response_content = "Uso: \\add id_del_scaneo commando_entre_[] (texto propio de salida de comando de otra herramienta o informacion propia)" 
+        response_content = "Uso: \\add id_del_scaneo (commando entre []) (texto propio de salida de comando de otra herramienta o informacion propia)" 
     return response_content
 
 def print(comando):
     if len(comando) == 2:
         try:
-            id_a_buscar = int(comando[1]) 
+            objeto_for_printing = Registro_IP.objects.get(id=comando[1])
+        except Registro_IP.DoesNotExist:
+            response_content = "No se encontró un objeto con ID " + comando[1]
         except ValueError:
             response_content = "No se encontró un objeto con ID " + comando[1]
         except Exception as e:
             response_content = "Ocurrió un error inesperado: " +str(e)
         else:
             try:
-                objeto_for_printing = Registro_IP.objects.get(id=id_a_buscar)
-            except Registro_IP.DoesNotExist:
-                response_content = "No se encontró un objeto con ID " + str(id_a_buscar)
+                contenedor_printing_atributos = [nombre_atributo for nombre_atributo in dir(objeto_for_printing) if nombre_atributo.startswith("contenedor")]
+                contenedor_printing_atributos_ordenados = sorted(contenedor_printing_atributos, key=lambda x: int(x.lstrip("contenedor")))
+
+                respuesta_printing_atributos = [nombre_atributo for nombre_atributo in dir(objeto_for_printing) if nombre_atributo.startswith("respuesta")]
+                respuesta_printing_atributos_ordenados = sorted(respuesta_printing_atributos, key=lambda x: int(x.lstrip("respuesta")))
+
+                contenido_contenedores = []
+                contenido_respuestas = []
+
+                for elemento in contenedor_printing_atributos_ordenados:
+                    if getattr(objeto_for_printing, elemento):
+                        texto_a_almacenar = getattr(objeto_for_printing, elemento)
+                        lineas = texto_a_almacenar.split("\n")
+                        if lineas:
+                            lineas[0] = "<u><b>" + lineas[0] + "</b></u><br>"
+                        texto_a_almacenar = "\n".join(lineas)
+                        texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
+                        contenido_contenedores.append(texto_a_almacenar)
+
+                for elemento in respuesta_printing_atributos_ordenados:
+                    if getattr(objeto_for_printing, elemento):
+                        texto_a_almacenar = getattr(objeto_for_printing, elemento)
+                        lineas = texto_a_almacenar.split("\n")
+                        if lineas:
+                            lineas[0] = "<b>" + lineas[0] + "</b>"
+                        texto_a_almacenar = "\n".join(lineas)
+                        texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
+                        contenido_respuestas.append(texto_a_almacenar)
+                
+                contenedores_y_respuestas = zip(contenido_contenedores, contenido_respuestas)
+                
+                context = {
+                    'nombre': objeto_for_printing.nombre,
+                    'empresa': objeto_for_printing.empresa,
+                    'resumen': objeto_for_printing.resumen.replace("\n", "<br>"),
+                    'resultado': objeto_for_printing.resultado.replace("\n", "<br>"),
+                    'recomendaciones': objeto_for_printing.recomendaciones.replace("\n", "<br>"),
+                    'contenedores_y_respuestas': contenedores_y_respuestas,
+                }
+                pdf = render_to_pdf('frontend/get_report_template.html', context)
+                pdf_filename = str(objeto_for_printing.id) + "_" + objeto_for_printing.IP + ".pdf"
+                pdf_path = "frontend/reports/" + pdf_filename
+                with open(pdf_path, 'wb') as pdf_file:
+                    pdf_file.write(pdf)
+                objeto_for_printing.reporte = pdf_path
+                objeto_for_printing.save()
+                response_content = "Se generó el documento."
+                response_content = response_content + "\n"
+                response_content = response_content + "Descárguelo aquí: <a href= \"download-pdf/" + str(comando[1]) + "/\">Descargar reporte</a>\n"
+            except PermissionError as e:
+                response_content = "Error: Permiso denegado al guardar el PDF: " + str(e)
+            except OSError as e:
+                response_content = "Error de E/S al guardar el PDF: " + str(e)
             except Exception as e:
                 response_content = "Ocurrió un error inesperado: " +str(e)
-            else:
-                try:
-                    contenedor_printing_atributos = [nombre_atributo for nombre_atributo in dir(objeto_for_printing) if nombre_atributo.startswith("contenedor")]
-                    contenedor_printing_atributos_ordenados = sorted(contenedor_printing_atributos, key=lambda x: int(x.lstrip("contenedor")))
-
-                    respuesta_printing_atributos = [nombre_atributo for nombre_atributo in dir(objeto_for_printing) if nombre_atributo.startswith("respuesta")]
-                    respuesta_printing_atributos_ordenados = sorted(respuesta_printing_atributos, key=lambda x: int(x.lstrip("respuesta")))
-
-                    contenido_contenedores = []
-                    contenido_respuestas = []
-
-                    for elemento in contenedor_printing_atributos_ordenados:
-                        if getattr(objeto_for_printing, elemento):
-                            texto_a_almacenar = getattr(objeto_for_printing, elemento)
-                            lineas = texto_a_almacenar.split("\n")
-                            if lineas:
-                                lineas[0] = "<u><b>" + lineas[0] + "</b></u><br>"
-                            texto_a_almacenar = "\n".join(lineas)
-                            texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
-                            contenido_contenedores.append(texto_a_almacenar)
-
-                    for elemento in respuesta_printing_atributos_ordenados:
-                        if getattr(objeto_for_printing, elemento):
-                            texto_a_almacenar = getattr(objeto_for_printing, elemento)
-                            lineas = texto_a_almacenar.split("\n")
-                            if lineas:
-                                lineas[0] = "<b>" + lineas[0] + "</b>"
-                            texto_a_almacenar = "\n".join(lineas)
-                            texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
-                            contenido_respuestas.append(texto_a_almacenar)
-                    
-                    contenedores_y_respuestas = zip(contenido_contenedores, contenido_respuestas)
-                    
-                    context = {
-                        'nombre': objeto_for_printing.nombre,
-                        'empresa': objeto_for_printing.empresa,
-                        'resumen': objeto_for_printing.resumen.replace("\n", "<br>"),
-                        'resultado': objeto_for_printing.resultado.replace("\n", "<br>"),
-                        'recomendaciones': objeto_for_printing.recomendaciones.replace("\n", "<br>"),
-                        'contenedores_y_respuestas': contenedores_y_respuestas,
-                    }
-                    pdf = render_to_pdf('frontend/get_report_template.html', context)
-                    pdf_filename = str(objeto_for_printing.id) + "_" + objeto_for_printing.IP + ".pdf"
-                    pdf_path = "frontend/reports/" + pdf_filename
-                    try:
-                        with open(pdf_path, 'wb') as pdf_file:
-                            pdf_file.write(pdf)
-                    except Exception as e:
-                        response_content = "Error de E/S al guardar el PDF: " + str(e)
-                    objeto_for_printing.reporte = pdf_path
-                    objeto_for_printing.save()
-                    response_content = "Se generó el documento."
-                    response_content = response_content + "\n"
-                    response_content = response_content + "Descárguelo aquí: <a href= \"download-pdf/" + str(id_a_buscar) + "/\">Descargar reporte</a>\n"
-                except Exception as e:
-                    response_content = "Ocurrió un error inesperado: " +str(e)
     else:
         response_content = "Uso: \\print id_del_scaneo" 
     return response_content
@@ -410,19 +414,21 @@ def download_pdf(request, objeto_id):
 def name(comando):
     if len(comando) >= 3:
         try:
-            id_a_buscar = int(comando[1])  
+            objeto = Registro_IP.objects.get(id=comando[1])
+        except Registro_IP.DoesNotExist:
+            response_content = "No se encontró un objeto con ID " + comando[1]
         except ValueError:
             response_content = "No se encontró un objeto con ID " + comando[1]
+        except Exception as e:
+            response_content = "Ocurrió un error inesperado: " +str(e)
         else:
             try:
-                objeto = Registro_IP.objects.get(id=id_a_buscar)
-            except Registro_IP.DoesNotExist:
-                response_content = "No se encontró un objeto con ID " + str(id_a_buscar)
-            else:
                 comando[2] = ' '.join(comando[2:])
                 objeto.nombre = comando[2]
                 objeto.save()
-                response_content = "El campo 'nombre' del objeto con ID " + str(id_a_buscar) + " ha sido modificado a " + comando[2]
+                response_content = "El campo 'nombre' del objeto con ID " + str(comando[1]) + " ha sido modificado a " + comando[2]
+            except Exception as e:
+                response_content = "Ocurrió un error inesperado: " +str(e)
     else:
         response_content = "Uso: \\name id_del_scaneo (Nombre del experto)"   
     return response_content
@@ -430,23 +436,21 @@ def name(comando):
 def company(comando):
     if len(comando) >= 3:
         try:
-            id_a_buscar = int(comando[1]) 
+            objeto = Registro_IP.objects.get(id=comando[1])
+        except Registro_IP.DoesNotExist:
+            response_content = "No se encontró un objeto con ID " + comando[1]
         except ValueError:
             response_content = "No se encontró un objeto con ID " + comando[1]
         except Exception as e:
             response_content = "Ocurrió un error inesperado: " +str(e)
         else:
             try:
-                objeto = Registro_IP.objects.get(id=id_a_buscar)
-            except Registro_IP.DoesNotExist:
-                response_content = "No se encontró un objeto con ID " + str(id_a_buscar)
-            except Exception as e:
-                response_content = "Ocurrió un error inesperado: " +str(e)
-            else:
                 comando[2] = ' '.join(comando[2:])
                 objeto.empresa = comando[2]
                 objeto.save()
-                response_content = "El campo 'empresa' del objeto con ID " + str(id_a_buscar) + " ha sido modificado a " + comando[2]
+                response_content = "El campo 'empresa' del objeto con ID " + str(comando[1]) + " ha sido modificado a " + comando[2]
+            except Exception as e:
+                response_content = "Ocurrió un error inesperado: " +str(e)
     else:
         response_content = "Uso: \\company id_del_scaneo (Nombre de la empresa a escanear)"   
     return response_content
@@ -454,19 +458,15 @@ def company(comando):
 def result(comando):
     if len(comando) == 2:
         try:
-            id_a_buscar = int(comando[1]) 
+            objeto = Registro_IP.objects.get(id=comando[1])
+        except Registro_IP.DoesNotExist:
+            response_content = "No se encontró un objeto con ID " + str(comando[1])
         except ValueError:
             response_content = "No se encontró un objeto con ID " + comando[1]
         except Exception as e:
             response_content = "Ocurrió un error inesperado: " +str(e)
         else:
             try:
-                objeto = Registro_IP.objects.get(id=id_a_buscar)
-            except Registro_IP.DoesNotExist:
-                response_content = "No se encontró un objeto con ID " + str(id_a_buscar)
-            except Exception as e:
-                response_content = "Ocurrió un error inesperado: " +str(e)
-            else:
                 respuesta_atributos = [nombre_atributo for nombre_atributo in dir(objeto) if nombre_atributo.startswith("respuesta")]
                 respuesta_atributos_ordenados = sorted(respuesta_atributos, key=lambda x: int(x.lstrip("respuesta")))
                 existe_contenedor_lleno = False
@@ -474,26 +474,26 @@ def result(comando):
                     if getattr(objeto, atributo):
                         messages_report_expert_detailed[-1]["content"] = getattr(objeto, atributo)
                         respuesta=get_model_response(messages_report_expert_detailed, getattr(objeto, atributo))
-                        if "error" in respuesta:
+                        if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         time.sleep(3)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     messages_report_expert_detailed[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
                     resultado = get_model_response(messages_report_expert_detailed, "Cuál es tu interpretación como experto de todo el texto introducido previamente?")
-                    if "error" in resultado:
-                            raise MyCustomError(resultado["error"])
+                    if isinstance(resultado, dict) and "error" in resultado:
+                        raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
                     time.sleep(5)
                     messages_report_expert_detailed[-1]["content"] = "resume tu interpretacion en menos de 350 letras"
                     resumen = get_model_response(messages_report_expert_detailed, "resume este texto en menos de 300 letras")
-                    if "error" in resumen:
+                    if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
                     time.sleep(5)
                     messages_report_expert_detailed[-1]["content"] = "dame recomendaciones de seguridad informática en base a todo lo que me dijistes"
                     recomendaciones = get_model_response(messages_report_expert_detailed, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
-                    if "error" in recomendaciones:
+                    if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
                     time.sleep(5)
@@ -501,6 +501,8 @@ def result(comando):
                     response_content = "Se analizaron las respuestas y se guardaron el resultado, el resumen y las recomendaciones."
                 else:
                     response_content = "Todos los contenedores están vacíos"
+            except Exception as e:
+                response_content = "Ocurrió un error inesperado: " +str(e)
     else:
         response_content = "Uso: \\result id_del_scaneo" 
     return response_content

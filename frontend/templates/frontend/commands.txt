@@ -24,7 +24,7 @@ Ejemplo: \scan www.google.com
 <b>\list:</b>    Este comando le permite listar los escaneos hechos antes.
 Ejemplo: \list
 
-<b>\add id_del_scaneo commando_entre_[] (texto propio de salida de comando de otra herramienta o informacion propia):</b>    Este comando le permite añadir información de otra herramienta o información relacionada al pentesting obtenida de otras maneras. 
+<b>\add id_del_scaneo (commando entre []) (texto propio de salida de comando de otra herramienta o informacion propia):</b>    Este comando le permite añadir información de otra herramienta o información relacionada al pentesting obtenida de otras maneras. 
 Debe incluir el id de un escaneo hecho antes, el nombre de la herramienta o de donde salio la informacion, encerrado entre [] y la información en sí.
 Ejemplo: \add 17 [fuente propia] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in quam eget libero eleifend lacinia. Proin nec justo nec tortor malesuada feugiat. Sed dapibus, odio in convallis varius, erat erat commodo felis, in pharetra ligula est ac ex.
 
