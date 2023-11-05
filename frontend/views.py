@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Mensaje, Linea_Comando, Registro_IP
 
-openai.api_key = "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"
+openai.api_key = ""
 messages = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting."},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
