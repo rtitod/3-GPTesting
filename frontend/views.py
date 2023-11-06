@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Mensaje, Linea_Comando, Registro_IP
 
-openai.api_key = ""
+openai.api_key = "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"
 messages = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting."},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
@@ -30,8 +30,8 @@ messages_report_expert_detailed = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma detallada cada texto que te pase"},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
-modelo = "gpt-3.5-turbo"
-#modelo = "gpt-4"
+#modelo = "gpt-3.5-turbo"
+modelo = "gpt-4"
 nombre_defecto="3GPTesting"
 empresa_defecto="ACME"
 
@@ -352,7 +352,7 @@ def print(comando):
                             lineas[0] = "<u><b>" + lineas[0] + "</b></u><br>"
                         texto_a_almacenar = "\n".join(lineas)
                         texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
-                        contenido_contenedores.append(texto_a_almacenar)
+                        contenido_contenedores.append(texto_a_almacenar.encode('ISO-8859-1', 'replace').decode('ISO-8859-1'))
 
                 for elemento in respuesta_printing_atributos_ordenados:
                     if getattr(objeto_for_printing, elemento):
@@ -362,16 +362,16 @@ def print(comando):
                             lineas[0] = "<b>" + lineas[0] + "</b>"
                         texto_a_almacenar = "\n".join(lineas)
                         texto_a_almacenar = texto_a_almacenar.replace("\n", "<br>")
-                        contenido_respuestas.append(texto_a_almacenar)
+                        contenido_respuestas.append(texto_a_almacenar.encode('ISO-8859-1', 'replace').decode('ISO-8859-1'))
                 
                 contenedores_y_respuestas = zip(contenido_contenedores, contenido_respuestas)
                 
                 context = {
-                    'nombre': objeto_for_printing.nombre,
-                    'empresa': objeto_for_printing.empresa,
-                    'resumen': objeto_for_printing.resumen.replace("\n", "<br>"),
-                    'resultado': objeto_for_printing.resultado.replace("\n", "<br>"),
-                    'recomendaciones': objeto_for_printing.recomendaciones.replace("\n", "<br>"),
+                    'nombre': objeto_for_printing.nombre.encode('ISO-8859-1', 'replace').decode('ISO-8859-1'),
+                    'empresa': objeto_for_printing.empresa.encode('ISO-8859-1', 'replace').decode('ISO-8859-1'),
+                    'resumen': objeto_for_printing.resumen.encode('ISO-8859-1', 'replace').decode('ISO-8859-1').replace("\n", "<br>"),
+                    'resultado': objeto_for_printing.resultado.encode('ISO-8859-1', 'replace').decode('ISO-8859-1').replace("\n", "<br>"),
+                    'recomendaciones': objeto_for_printing.recomendaciones.encode('ISO-8859-1', 'replace').decode('ISO-8859-1').replace("\n", "<br>"),
                     'contenedores_y_respuestas': contenedores_y_respuestas,
                 }
                 pdf = render_to_pdf('frontend/get_report_template.html', context)
@@ -538,6 +538,7 @@ def render_to_pdf(template_src, context_dict={}):
     html  = template.render(context_dict)
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+    #pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
     if not pdf.err:
         return result.getvalue()
     return None
