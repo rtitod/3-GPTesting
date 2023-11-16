@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3GPTesting</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
 </head>
 <body>
-    <div id="chat">
-        <div id="mensajes"></div>
-        <textarea id="mensaje" rows="5" cols="120"></textarea>
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <div id="loading"></div>
-        <button id="enviar">Enviar</button>
+    <div class="container">
+        <div id="chat" class="main-content">
+            <div id="mensajes"></div>
+            <textarea id="mensaje" rows="5" cols="120"></textarea>
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <div id="loading"></div>
+            <button id="enviar">Enviar</button>
+        </div>
+        <div class="floating-window">
+            <h2>Tutorial</h2>
+            <p>{{ tutorial | linebreaks }}</p>
+        </div>
     </div>
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -52,7 +62,7 @@
 
                 if (contenido.trim() !== '') {
                     $('#enviar').prop('disabled', true);
-                    $('#mensaje').val('Procesando, espere por favor. Si demora la respuesta, recarge esta página.');
+                    $('#mensaje').val('Procesando, espere por favor. Si la respuesta demora más de 10 minutos, recarge esta página.');
                     $('#mensaje').prop('disabled', true); 
                     $.ajax({
                     url: '/enviar_mensaje/',
@@ -63,7 +73,7 @@
                     },
                     success: function(data) {
                         cargarMensajes();
-                        $('#mensaje').val(''); // Limpiar el contenido del textbox
+                        $('#mensaje').val(''); 
                     }
                 });
                 }

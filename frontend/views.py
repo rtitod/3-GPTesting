@@ -12,6 +12,7 @@ import socket
 import subprocess
 import time
 import re
+import html
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -30,8 +31,8 @@ messages_report_expert_detailed = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma detallada cada texto que te pase"},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
-#modelo = "gpt-3.5-turbo"
-modelo = "gpt-4"
+modelo = "gpt-3.5-turbo"
+#modelo = "gpt-4"
 nombre_defecto="3GPTesting"
 empresa_defecto="ACME"
 
@@ -45,28 +46,38 @@ def enviar_mensaje(request):
                 comando = contenido.split()
                 if comando[0] == "\\add_cmd":
                     response_content = add_cmd(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\del_cmd":
                     response_content = del_cmd(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\edit_cmd":
                     response_content = edit_cmd(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\list_cmd":
                     response_content = list_cmd(comando)
                 elif comando[0] == "\\scan":
                     response_content = scan(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\list":
                     response_content = list(comando)
                 elif comando[0] == "\\add":
                     response_content = add(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\print":
                     response_content = print(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\name":
                     response_content = name(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\company":
                     response_content = company(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\result":
                     response_content = result(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\clear":
                     response_content = clear(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\help":
                     response_content = help(comando)
                 else:
@@ -75,13 +86,13 @@ def enviar_mensaje(request):
                 messages[-1]["content"] = contenido
                 response_content = get_model_response(messages, contenido)
                 if isinstance(response_content, dict) and "error" in response_content:
-                    contenido = contenido.replace('\n', '<br>')
+                    contenido = html.escape(contenido).replace('\n', '<br>')
                     response_content = str(response_content).replace('\n', '<br>')
                     mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
                     return JsonResponse({'mensaje': mensaje.contenido, 
                                         'respuesta': mensaje.respuesta, 
                                         'fecha': mensaje.fecha.strftime('%Y-%m-%d %H:%M:%S')})
-            contenido = contenido.replace('\n', '<br>')
+            contenido = html.escape(contenido).replace('\n', '<br>')
             response_content = response_content.replace('\n', '<br>')
             mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
             return JsonResponse({'mensaje': mensaje.contenido, 
@@ -101,8 +112,21 @@ def recuperar_mensajes(request):
         return JsonResponse({'error': str(e)})
 
 def index(request):
-    return render(request, 'frontend/index.html')
-
+    try:
+        with open("frontend/templates/frontend/tutorial.txt", "r") as file:
+            context = {
+                    'tutorial': file.read()
+                }
+    except FileNotFoundError:
+        context = {
+                    'tutorial': "El archivo de ayuda no se encontró."
+                }
+    except Exception as e:
+        context = {
+                    'tutorial': "Ocurrió un error inesperado: " + str(e)
+                }
+    return render(request, 'frontend/index.html', context)
+    
 def es_ip_o_host_valido(cadena):
     try:
         socket.inet_aton(cadena)
@@ -211,8 +235,8 @@ def list_cmd(comando):
 
                 for objeto in objetos_linea_comando:
                     obj_id = objeto.id
-                    obj_comando = objeto.comando
-                    obj_parametros = objeto.parametros
+                    obj_comando = html.escape(objeto.comando)
+                    obj_parametros = html.escape(objeto.parametros)
                     tabla_html += f"<tr><td>{obj_id}</td><td>{obj_comando}</td><td>{obj_parametros}</td></tr>"
                 tabla_html += "</table>"
                 response_content = tabla_html
@@ -265,10 +289,10 @@ def list(comando):
 
                 for objeto in objetos_registro_ip:
                     obj_id = objeto.id
-                    obj_host = objeto.IP
+                    obj_host = html.escape(objeto.IP)
                     obj_fecha = objeto.fecha
-                    obj_experto = objeto.nombre
-                    obj_empresa = objeto.empresa
+                    obj_experto = html.escape(objeto.nombre)
+                    obj_empresa = html.escape(objeto.empresa)
                     tabla_html += f"<tr><td>{obj_id}</td><td>{obj_host}</td><td>{obj_fecha}</td><td>{obj_experto}</td><td>{obj_empresa}</td></tr>"
                 tabla_html += "</table>"
                 response_content = tabla_html
@@ -347,7 +371,7 @@ def print(comando):
                 for elemento in contenedor_printing_atributos_ordenados:
                     if getattr(objeto_for_printing, elemento):
                         texto_a_almacenar = getattr(objeto_for_printing, elemento)
-                        lineas = texto_a_almacenar.split("\n")
+                        lineas = html.escape(texto_a_almacenar).split("\n")
                         if lineas:
                             lineas[0] = "<u><b>" + lineas[0] + "</b></u><br>"
                         texto_a_almacenar = "\n".join(lineas)
@@ -357,7 +381,7 @@ def print(comando):
                 for elemento in respuesta_printing_atributos_ordenados:
                     if getattr(objeto_for_printing, elemento):
                         texto_a_almacenar = getattr(objeto_for_printing, elemento)
-                        lineas = texto_a_almacenar.split("\n")
+                        lineas = html.escape(texto_a_almacenar).split("\n")
                         if lineas:
                             lineas[0] = "<b>" + lineas[0] + "</b>"
                         texto_a_almacenar = "\n".join(lineas)
@@ -367,11 +391,11 @@ def print(comando):
                 contenedores_y_respuestas = zip(contenido_contenedores, contenido_respuestas)
                 
                 context = {
-                    'nombre': objeto_for_printing.nombre,
-                    'empresa': objeto_for_printing.empresa,
-                    'resumen': objeto_for_printing.resumen.replace("\n", "<br>"),
-                    'resultado': objeto_for_printing.resultado.replace("\n", "<br>"),
-                    'recomendaciones': objeto_for_printing.recomendaciones.replace("\n", "<br>"),
+                    'nombre': html.escape(objeto_for_printing.nombre),
+                    'empresa': html.escape(objeto_for_printing.empresa),
+                    'resumen': html.escape(objeto_for_printing.resumen).replace("\n", "<br>"),
+                    'resultado': html.escape(objeto_for_printing.resultado).replace("\n", "<br>"),
+                    'recomendaciones': html.escape(objeto_for_printing.recomendaciones).replace("\n", "<br>"),
                     'contenedores_y_respuestas': contenedores_y_respuestas,
                 }
                 pdf = render_to_pdf('frontend/get_report_template.html', context)

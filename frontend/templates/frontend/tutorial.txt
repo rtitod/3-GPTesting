@@ -1,0 +1,9 @@
+Pasos para hacer un escaneo simple
+
+\scan www.google.com
+\list
+\add 1 [otra herramienta] contenido obtenido
+\name 1 Mi nombre
+\company Nombre de la empresa
+\result 1
+\print 1
