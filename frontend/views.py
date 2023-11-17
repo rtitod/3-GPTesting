@@ -165,7 +165,7 @@ def ejecutar_comando(comando_str):
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
 def get_model_response(conversation, user_message, max_attempts=6):
-    user_message = truncate_to_1000_words(user_message)
+    #user_message = truncate_to_1000_words(user_message)
     conversation.append({"role": "user", "content": user_message})
     for attempt in range(1, max_attempts + 1):
         try:
