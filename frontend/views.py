@@ -140,14 +140,16 @@ def es_ip_o_host_valido(cadena):
 def ejecutar_comando(comando_str):
     try:
         directorio_personalizado = "frontend/scripts"
+        comando_personalizado = os.path.join(directorio_personalizado, comando_str)
+        print(comando_personalizado) 
         if directorio_personalizado:
-            comando_personalizado = os.path.join(directorio_personalizado, comando_str)
+            comando = comando_str.split()
             resultado_personalizado = subprocess.check_output(comando_personalizado, stderr=subprocess.STDOUT, text=True)
             return resultado_personalizado
-
-        comando = comando_str.split()
-        resultado = subprocess.check_output(comando, stderr=subprocess.STDOUT, text=True)
-        return resultado
+        else:
+            comando = comando_str.split()
+            resultado = subprocess.check_output(comando, stderr=subprocess.STDOUT, text=True)
+            return resultado
     except subprocess.CalledProcessError as e:
         return f"El comando no existe o se produjo un error: \n {e.output}"
     except Exception as e:
