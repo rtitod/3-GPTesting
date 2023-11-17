@@ -180,10 +180,12 @@ def get_model_response(conversation, conversation_for_reset, user_message, max_a
             return response_from_api
         except Exception as e:
             if 'However, your messages resulted in' in str(e) :
-                conversation = copy.deepcopy(conversation_for_reset)
+                conversation.clear()
+                conversation.extend(copy.deepcopy(conversation_for_reset))
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif 'Request too large' in str(e) :
-                conversation = copy.deepcopy(conversation_for_reset)
+                conversation.clear()
+                conversation.extend(copy.deepcopy(conversation_for_reset))
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif attempt == max_attempts:
                 return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
