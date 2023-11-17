@@ -152,7 +152,8 @@ def get_model_response(conversation, user_message):
         conversation.append({"role": "user", "content": user_message})
         response = openai.ChatCompletion.create(
             model=modelo,
-            messages=conversation
+            messages=conversation,
+            request_timeout=300, 
         )
         return response['choices'][0]['message']['content']
     except Exception as e:
@@ -499,7 +500,7 @@ def result(comando):
                         respuesta=get_model_response(messages_report_expert_detailed, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        time.sleep(5)
+                        time.sleep(25)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     messages_report_expert_detailed[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
@@ -507,19 +508,19 @@ def result(comando):
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
-                    time.sleep(5)
+                    time.sleep(25)
                     messages_report_expert_detailed[-1]["content"] = "resume tu interpretacion en menos de 350 letras"
                     resumen = get_model_response(messages_report_expert_detailed, "resume este texto en menos de 300 letras")
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
-                    time.sleep(5)
+                    time.sleep(25)
                     messages_report_expert_detailed[-1]["content"] = "dame recomendaciones de seguridad informática en base a todo lo que me dijistes"
                     recomendaciones = get_model_response(messages_report_expert_detailed, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
-                    time.sleep(5)
+                    time.sleep(25)
                     objeto.save()
                     response_content = "Se analizaron las respuestas y se guardaron el resultado, el resumen y las recomendaciones."
                 else:
