@@ -15,10 +15,10 @@ import re
 import html
 
 from django.views.decorators.csrf import csrf_exempt
-
+from .api import modelo,apikey
 from .models import Mensaje, Linea_Comando, Registro_IP
 
-openai.api_key = "insert paid api key here"
+openai.api_key = apikey
 messages = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting."},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
@@ -31,8 +31,7 @@ messages_report_expert_detailed = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma detallada cada texto que te pase"},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
-modelo = "gpt-3.5-turbo"
-#modelo = "gpt-4"
+
 nombre_defecto="3GPTesting"
 empresa_defecto="ACME"
 
