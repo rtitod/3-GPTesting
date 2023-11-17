@@ -2,7 +2,7 @@
 
 <b>\add_cmd nombre_del_comando (parametros incluyendo $ip):</b>    Este comando le permite añadir una linea de comandos para llamar una herramienta de seguridad de su sistema. 
 Debe incluir el string $ip que será el valor que 3GPTesting reemplazará a la hora del escaneo con la ip o el host objetivo.
-3GPTesting antes de buscar el comando en el sistema buscará los comandos en el directorio frontend/scripts, por lo que es una buena idea incluir scripts que facilite la llamada a programas de ejecución más complicada.
+3GPTesting antes de buscar el comando en el sistema buscará los comandos en el directorio frontend/scripts, por lo que es una buena idea incluir scripts que faciliten la llamada a programas de ejecución más complicada (no se olvide de agregar permiso de ejecución a esos scripts).
 Ejemplo: \add_cmd nmap -p20-200 $ip
 
 <b>\del_cmd id:</b>    Este comando le permite eliminar una linea de comandos especificando el id de la linea de comandos.

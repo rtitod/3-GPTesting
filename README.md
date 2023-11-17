@@ -22,7 +22,7 @@ En primer lugar se deberá instalar los siguientes utilitarios:
 
 `sudo apt install python3-virtualenv python3-venv`
 
-Para tener una lista de herramientas básicas para el scaneo, tanto automático como manual, se sugiere instalar estas herramientas tambien (se recomienda la instalacion prioritaria de las tres primeras herramientas de la siguiente lista):
+Para tener una lista de herramientas básicas para el scaneo, tanto automático como manual, se sugiere instalar estas herramientas tambien (se recomienda la instalacion prioritaria de las tres primeras herramientas de la siguiente lista, ya que serán manejadas automáticamente por 3GPTesting, mientras que deberá recoger la salida de las otras herramientas y añadirlas al informe usando el comando \add):
 
 `sudo apt install nmap`
 
@@ -56,13 +56,13 @@ Luego deberá activar el entorno virtual con el siguiente comando:
 
 `source bin/activate`
 
-Lo siguiente es cvambiar de directorio
+Lo siguiente que se debe hacer es cambiar de directorio
 
 `cd 3-GPTesting`
 
 Instalar las dependencias
 
-`pip3 install -r requirements.tx`
+`pip3 install -r requirements.txt`
 
 Y ejecutar la aplicación:
 
