@@ -94,8 +94,6 @@ def enviar_mensaje(request):
             else:
                 response_content = get_model_response(chat_context, chat_context_original, contenido, )
                 if isinstance(response_content, dict) and "error" in response_content:
-                    if 'However, your messages resulted in' in response_content['error'] or 'Request too large' in response_content['error']:
-                        chat_context = copy.deepcopy(chat_context_original)
                     contenido = html.escape(contenido).replace('\n', '<br>')
                     response_content = str(response_content).replace('\n', '<br>')
                     mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
