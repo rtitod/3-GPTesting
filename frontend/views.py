@@ -146,7 +146,7 @@ def ejecutar_comando(comando_str):
     except Exception as e:
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
-def get_model_response(conversation, user_message, max_attempts=5):
+def get_model_response(conversation, user_message, max_attempts=6):
     for attempt in range(1, max_attempts + 1):
         try:
             conversation.append({"role": "user", "content": user_message})
@@ -155,7 +155,10 @@ def get_model_response(conversation, user_message, max_attempts=5):
                 messages=conversation,
                 request_timeout=60,
             )
-            return response['choices'][0]['message']['content']
+            if 'choices' in response and response['choices']:
+                return response['choices'][0]['message']['content']
+            elif 'error' in response and response['error']['code'] == 'usage':
+                return {"error": response['error']['message']}
         except Exception as e:
             if attempt == max_attempts:
                 return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
