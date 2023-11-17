@@ -157,6 +157,7 @@ def ejecutar_comando(comando_str):
 def get_model_response(conversation, user_message, max_attempts=6, max_tokens_per_request=4096):
     user_message_parts = [user_message[i:i+max_tokens_per_request] for i in range(0, len(user_message), max_tokens_per_request)]
     for part in user_message_parts:
+        print(part)
         for attempt in range(1, max_attempts + 1):
             try:
                 conversation.append({"role": "user", "content": part})
