@@ -61,9 +61,9 @@ def enviar_mensaje(request):
                     response_content = list(comando)
                 elif comando[0] == "\\add":
                     response_content = add(comando)
+                    response_content = html.escape(response_content)
                 elif comando[0] == "\\print":
                     response_content = print(comando)
-                    response_content = html.escape(response_content)
                 elif comando[0] == "\\name":
                     response_content = name(comando)
                     response_content = html.escape(response_content)
