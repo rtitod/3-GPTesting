@@ -265,7 +265,7 @@ def scan(comando):
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         setattr(registro_ip, f"respuesta{i}", respuesta)
-                        time.sleep(2)
+                        time.sleep(15)
                     registro_ip.save()
                     response_content = "El escaneo a la dirección: " + comando[1] + " ha sido completado."
                 else:
