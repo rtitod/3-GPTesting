@@ -62,7 +62,7 @@
 
                 if (contenido.trim() !== '') {
                     $('#enviar').prop('disabled', true);
-                    $('#mensaje').val('Procesando, espere por favor. Si la respuesta demora más de 10 minutos, recarge esta página.');
+                    $('#mensaje').val('Procesando, espere por favor. Si la respuesta demora bastante, recarge esta página.');
                     $('#mensaje').prop('disabled', true); 
                     $.ajax({
                     url: '/enviar_mensaje/',
@@ -78,8 +78,11 @@
                 });
                 }
             }
-    
             cargarMensajes();
+
+            $(window).on('load', function() {
+                $('#mensaje').val('');
+            });
         });
     </script>
     
