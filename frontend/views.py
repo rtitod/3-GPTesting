@@ -155,10 +155,7 @@ def get_model_response(conversation, user_message, max_attempts=6):
                 messages=conversation,
                 request_timeout=60,
             )
-            if 'choices' in response and response['choices']:
-                return response['choices'][0]['message']['content']
-            elif 'error' in response and response['error']['code'] == 'usage':
-                return {"error": response['error']['message']}
+            return response['choices'][0]['message']['content']
         except Exception as e:
             if 'tokens' in str(e) :
                 return {"error": f"Ocurrió un error inesperado : {str(e)}"}
