@@ -154,25 +154,28 @@ def ejecutar_comando(comando_str):
     except Exception as e:
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
-def get_model_response(conversation, user_message, max_attempts=6):
-    for attempt in range(1, max_attempts + 1):
-        try:
-            conversation.append({"role": "user", "content": user_message})
-            response = openai.ChatCompletion.create(
-                model=modelo,
-                messages=conversation,
-                request_timeout=60,
-            )
-            return response['choices'][0]['message']['content']
-        except Exception as e:
-            if 'However, your messages resulted in' in str(e) :
-                return {"error": "Ocurrió un error inesperado: " + str(e)}
-            elif 'Request too large' in str(e) :
-                return {"error": "Ocurrió un error inesperado: " + str(e)}
-            elif attempt == max_attempts:
-                return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
-            else:
-                time.sleep(7)
+def get_model_response(conversation, user_message, max_attempts=6, max_tokens_per_request=4096):
+    user_message_parts = [user_message[i:i+max_tokens_per_request] for i in range(0, len(user_message), max_tokens_per_request)]
+    for part in user_message_parts:
+        for attempt in range(1, max_attempts + 1):
+            try:
+                conversation.append({"role": "user", "content": part})
+                response = openai.ChatCompletion.create(
+                    model=modelo,
+                    messages=conversation,
+                    request_timeout=60,
+                )
+                break
+            except Exception as e:
+                if 'However, your messages resulted in' in str(e) :
+                    return {"error": "Ocurrió un error inesperado: " + str(e)}
+                elif 'Request too large' in str(e) :
+                    return {"error": "Ocurrió un error inesperado: " + str(e)}
+                elif attempt == max_attempts:
+                    return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
+                else:
+                    time.sleep(7)
+    return response['choices'][0]['message']['content']
 
 def add_cmd(comando):
     if len(comando) >= 3:
