@@ -158,9 +158,9 @@ def get_model_response(conversation, user_message, max_attempts=6):
             return response['choices'][0]['message']['content']
         except Exception as e:
             if 'tokens' in str(e) :
-                return {"error": f"Ocurrió un error inesperado : {str(e)}"}
+                return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif attempt == max_attempts:
-                return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
+                return {"error": "Ocurrió un error inesperado después de " + str(max_attempts) + " intentos: " + str(e)}
             else:
                 time.sleep(7)
 
