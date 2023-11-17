@@ -63,7 +63,7 @@ def enviar_mensaje(request):
                     response_content = add(comando)
                     response_content = html.escape(response_content)
                 elif comando[0] == "\\print":
-                    response_content = print(comando)
+                    response_content = print_(comando)
                 elif comando[0] == "\\name":
                     response_content = name(comando)
                     response_content = html.escape(response_content)
@@ -354,7 +354,7 @@ def add(comando):
         response_content = "Uso: \\add id_del_scaneo (commando entre []) (texto propio de salida de comando de otra herramienta o informacion propia)" 
     return response_content
 
-def print(comando):
+def print_(comando):
     if len(comando) == 2:
         try:
             objeto_for_printing = Registro_IP.objects.get(id=comando[1])
