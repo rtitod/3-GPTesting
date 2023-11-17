@@ -154,6 +154,7 @@ def get_model_response(conversation, user_message):
             messages=conversation,
             request_timeout=300, 
         )
+        time.sleep(15)
         return response['choices'][0]['message']['content']
     except Exception as e:
         return {"error": "Ocurrió un error inesperado: " + str(e)}
@@ -265,7 +266,7 @@ def scan(comando):
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         setattr(registro_ip, f"respuesta{i}", respuesta)
-                        time.sleep(15)
+                        time.sleep(2)
                     registro_ip.save()
                     response_content = "El escaneo a la dirección: " + comando[1] + " ha sido completado."
                 else:
@@ -499,7 +500,7 @@ def result(comando):
                         respuesta=get_model_response(messages_report_expert_detailed, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        time.sleep(25)
+                        time.sleep(12)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     messages_report_expert_detailed[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
@@ -507,19 +508,19 @@ def result(comando):
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
-                    time.sleep(25)
+                    time.sleep(12)
                     messages_report_expert_detailed[-1]["content"] = "resume tu interpretacion en menos de 350 letras"
                     resumen = get_model_response(messages_report_expert_detailed, "resume este texto en menos de 300 letras")
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
-                    time.sleep(25)
+                    time.sleep(12)
                     messages_report_expert_detailed[-1]["content"] = "dame recomendaciones de seguridad informática en base a todo lo que me dijistes"
                     recomendaciones = get_model_response(messages_report_expert_detailed, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
-                    time.sleep(25)
+                    time.sleep(12)
                     objeto.save()
                     response_content = "Se analizaron las respuestas y se guardaron el resultado, el resumen y las recomendaciones."
                 else:
