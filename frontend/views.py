@@ -92,7 +92,6 @@ def enviar_mensaje(request):
                 else:
                     response_content = "Comando no reconocido"
             else:
-                chat_context[-1]["content"] = contenido
                 response_content = get_model_response(chat_context, chat_context_original, contenido, )
                 if isinstance(response_content, dict) and "error" in response_content:
                     contenido = html.escape(contenido).replace('\n', '<br>')
