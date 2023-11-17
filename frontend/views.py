@@ -1,3 +1,4 @@
+import copy
 import os
 from django.db import IntegrityError
 from django.shortcuts import render
@@ -20,18 +21,32 @@ from .api import modelo,apikey
 from .models import Mensaje, Linea_Comando, Registro_IP
 
 openai.api_key = apikey
-messages = [{"role": "system",
+chat_context_original = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting."},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
-messages_report_expert = [{"role": "system",
-               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar cada fragmento de texto que te pase"},
+scan_context_original = [{"role": "system",
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar el texto que te pase"},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
-messages_report_expert_detailed = [{"role": "system",
-               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma detallada cada texto que te pase"},
+add_context_original = [{"role": "system",
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar el texto que te pase. En maximo 300 caracteres"},
             {"role": "user", "content": "¿Cuál es tu nombre?"}
             ]
+result_context_summary_original = [{"role": "system",
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma conjunta cada texto que te pase"},
+            {"role": "user", "content": "¿Cuál es tu nombre?"}
+            ]
+result_context_other_original = [{"role": "system",
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar cada texto que te pase"},
+            {"role": "user", "content": "¿Cuál es tu nombre?"}
+            ]
+
+chat_context = copy.deepcopy(chat_context_original)
+scan_context = [copy.deepcopy(scan_context_original) for _ in range(80)]
+add_context = copy.deepcopy(add_context_original)
+result_context_summary = copy.deepcopy(result_context_summary_original)
+result_context_other = copy.deepcopy(result_context_other_original)
 
 nombre_defecto="3GPTesting"
 empresa_defecto="ACME"
@@ -82,8 +97,8 @@ def enviar_mensaje(request):
                 else:
                     response_content = "Comando no reconocido"
             else:
-                messages[-1]["content"] = contenido
-                response_content = get_model_response(messages, contenido)
+                chat_context[-1]["content"] = contenido
+                response_content = get_model_response(chat_context, contenido)
                 if isinstance(response_content, dict) and "error" in response_content:
                     contenido = html.escape(contenido).replace('\n', '<br>')
                     response_content = str(response_content).replace('\n', '<br>')
@@ -155,7 +170,7 @@ def ejecutar_comando(comando_str):
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
 def get_model_response(conversation, user_message, max_attempts=6):
-    user_message = truncate_to_2000_words(user_message)
+    user_message = truncate_to_3000_words(user_message)
     for attempt in range(1, max_attempts + 1):
         try:
             conversation.append({"role": "user", "content": user_message})
@@ -175,9 +190,9 @@ def get_model_response(conversation, user_message, max_attempts=6):
             else:
                 time.sleep(7)
 
-def truncate_to_2000_words(input_string):
+def truncate_to_3000_words(input_string):
     words = input_string.split()
-    truncated_words = words[:2000]
+    truncated_words = words[:3000]
     truncated_string = ' '.join(truncated_words)
     return truncated_string
 
@@ -283,8 +298,9 @@ def scan(comando):
                         salida = ejecutar_comando(linea_de_comando)
                         salida = "[" + linea_de_comando + "]:\n" + salida
                         setattr(registro_ip, f"contenedor{i}", salida)
-                        messages_report_expert[-1]["content"] = salida
-                        respuesta = get_model_response(messages_report_expert, salida)
+                        scan_context[i-1] = copy.deepcopy(scan_context_original)
+                        scan_context[i-1][-1]["content"] = salida
+                        respuesta = get_model_response(scan_context[i-1], salida)
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         setattr(registro_ip, f"respuesta{i}", respuesta)
@@ -349,8 +365,9 @@ def add(comando):
                         if not getattr(objeto, atributo):
                             salida = "[" + coincidencias[0][0] + "]" + ":\n" + coincidencias[0][1]
                             setattr(objeto, atributo, salida)
-                            messages_report_expert[-1]["content"] = salida
-                            respuesta = get_model_response(messages_report_expert, salida)
+                            add_context = copy.deepcopy(add_context_original)
+                            add_context[-1]["content"] = salida
+                            respuesta = get_model_response(add_context, salida)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
                             numero = atributo.lstrip("contenedor")
@@ -516,29 +533,31 @@ def result(comando):
                 respuesta_atributos = [nombre_atributo for nombre_atributo in dir(objeto) if nombre_atributo.startswith("respuesta")]
                 respuesta_atributos_ordenados = sorted(respuesta_atributos, key=lambda x: int(x.lstrip("respuesta")))
                 existe_contenedor_lleno = False
+                result_context_summary = copy.deepcopy(result_context_summary_original)
                 for atributo in respuesta_atributos_ordenados:
                     if getattr(objeto, atributo):
-                        messages_report_expert_detailed[-1]["content"] = getattr(objeto, atributo)
-                        respuesta=get_model_response(messages_report_expert_detailed, getattr(objeto, atributo))
+                        result_context_summary[-1]["content"] = getattr(objeto, atributo)
+                        respuesta=get_model_response(result_context_summary, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         time.sleep(17)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
-                    messages_report_expert_detailed[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
-                    resultado = get_model_response(messages_report_expert_detailed, "Cuál es tu interpretación como experto de todo el texto introducido previamente?")
+                    result_context_other = copy.deepcopy(result_context_other_original)
+                    result_context_other[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
+                    resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de todo el texto introducido previamente?")
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
                     time.sleep(17)
-                    messages_report_expert_detailed[-1]["content"] = "resume tu interpretacion en menos de 350 letras"
-                    resumen = get_model_response(messages_report_expert_detailed, "resume este texto en menos de 300 letras")
+                    result_context_other[-1]["content"] = "resume tu interpretacion en menos de 350 letras"
+                    resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras")
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
                     time.sleep(17)
-                    messages_report_expert_detailed[-1]["content"] = "dame recomendaciones de seguridad informática en base a todo lo que me dijistes"
-                    recomendaciones = get_model_response(messages_report_expert_detailed, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
+                    result_context_other[-1]["content"] = "dame recomendaciones de seguridad informática en base a todo lo que me dijistes"
+                    recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
