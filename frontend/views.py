@@ -499,7 +499,7 @@ def result(comando):
                         respuesta=get_model_response(messages_report_expert_detailed, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        time.sleep(3)
+                        time.sleep(5)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     messages_report_expert_detailed[-1]["content"] = "Cuál es tu interpretación como experto de todo el texto introducido previamente?"
