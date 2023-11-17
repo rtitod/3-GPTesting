@@ -297,6 +297,8 @@ def scan(comando):
                         setattr(registro_ip, f"contenedor{i}", salida)
                         scan_context = copy.deepcopy(scan_context_original)
                         respuesta = get_model_response(scan_context, salida)
+                        for mensaje in scan_context:
+                            print(f"{mensaje['role']}: {mensaje['content']}")
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         setattr(registro_ip, f"respuesta{i}", respuesta)
