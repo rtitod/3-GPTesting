@@ -24,6 +24,10 @@
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        window.onbeforeunload = function () {
+            $('#mensaje').val('');
+        };
+        
         $(document).ready(function() {
             var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
 
@@ -79,10 +83,6 @@
                 }
             }
             cargarMensajes();
-
-            $(window).on('load', function() {
-                $('#mensaje').val('');
-            });
         });
     </script>
     
