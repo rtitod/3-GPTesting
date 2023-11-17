@@ -98,6 +98,8 @@ def enviar_mensaje(request):
                     contenido = html.escape(contenido).replace('\n', '<br>')
                     response_content = str(response_content).replace('\n', '<br>')
                     mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
+                    for mensaje in chat_context:
+                        print(f"{mensaje['role']}: {mensaje['content']}")
                     return JsonResponse({'mensaje': mensaje.contenido, 
                                         'respuesta': mensaje.respuesta, 
                                         'fecha': mensaje.fecha.strftime('%Y-%m-%d %H:%M:%S')})
