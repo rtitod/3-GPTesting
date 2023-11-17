@@ -142,10 +142,11 @@ def ejecutar_comando(comando_str):
         directorio_personalizado = "frontend/scripts"
         comando_personalizado = os.path.join(directorio_personalizado, comando_str)
         print(comando_personalizado)
-        print(comando_personalizado.split()[0])  
+        print(comando_personalizado.split()[0])
         if os.path.exists(comando_personalizado.split()[0]) and os.access(comando_personalizado.split()[0], os.X_OK):
-            comando = comando_str.split()
-            resultado_personalizado = subprocess.check_output(comando_personalizado, stderr=subprocess.STDOUT, text=True)
+            print("existe")
+            comando = comando_personalizado.split()
+            resultado_personalizado = subprocess.check_output(comando, stderr=subprocess.STDOUT, text=True)
             return resultado_personalizado
         else:
             comando = comando_str.split()
