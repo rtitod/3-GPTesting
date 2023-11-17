@@ -146,18 +146,21 @@ def ejecutar_comando(comando_str):
     except Exception as e:
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
-def get_model_response(conversation, user_message):
-    try:
-        conversation.append({"role": "user", "content": user_message})
-        response = openai.ChatCompletion.create(
-            model=modelo,
-            messages=conversation,
-            request_timeout=300, 
-        )
-        time.sleep(7)
-        return response['choices'][0]['message']['content']
-    except Exception as e:
-        return {"error": "Ocurrió un error inesperado: " + str(e)}
+def get_model_response(conversation, user_message, max_attempts=5):
+    for attempt in range(1, max_attempts + 1):
+        try:
+            conversation.append({"role": "user", "content": user_message})
+            response = openai.ChatCompletion.create(
+                model=modelo,
+                messages=conversation,
+                request_timeout=60,
+            )
+            return response['choices'][0]['message']['content']
+        except Exception as e:
+            if attempt == max_attempts:
+                return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
+            else:
+                time.sleep(7)
 
 def add_cmd(comando):
     if len(comando) >= 3:
