@@ -94,11 +94,11 @@ def enviar_mensaje(request):
             else:
                 response_content = get_model_response(chat_context, chat_context_original, contenido, )
                 if isinstance(response_content, dict) and "error" in response_content:
+                    if 'However, your messages resulted in' in response_content['error'] or 'Request too large' in response_content['error']:
+                        chat_context = copy.deepcopy(chat_context_original)
                     contenido = html.escape(contenido).replace('\n', '<br>')
                     response_content = str(response_content).replace('\n', '<br>')
                     mensaje = Mensaje.objects.create(contenido=contenido,respuesta=response_content)
-                    for mensaje in chat_context:
-                        print(f"{mensaje['role']}: {mensaje['content']}")
                     return JsonResponse({'mensaje': mensaje.contenido, 
                                         'respuesta': mensaje.respuesta, 
                                         'fecha': mensaje.fecha.strftime('%Y-%m-%d %H:%M:%S')})
@@ -180,12 +180,8 @@ def get_model_response(conversation, conversation_for_reset, user_message, max_a
             return response_from_api
         except Exception as e:
             if 'However, your messages resulted in' in str(e) :
-                conversation.clear()
-                conversation.extend(copy.deepcopy(conversation_for_reset))
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif 'Request too large' in str(e) :
-                conversation.clear()
-                conversation.extend(copy.deepcopy(conversation_for_reset))
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif attempt == max_attempts:
                 return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
