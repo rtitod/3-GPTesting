@@ -156,16 +156,15 @@ def get_model_response(conversation, user_message, max_attempts=6):
                 request_timeout=60,
             )
             return response['choices'][0]['message']['content']
-        except openai.APITimeoutError as e:
-            try:
-                if attempt == max_attempts:
-                    return {"error": "Ocurrió un error inesperado después de " + str(max_attempts) + " intentos: " + str(e)}
-                else:
-                    time.sleep(7)
-            except Exception as e:
-                return {"error": "Ocurrió un error inesperado: " + str(e)}
         except Exception as e:
+            if 'However, your messages resulted in' in str(e) :
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
+            elif 'Request too large' in str(e) :
+                return {"error": "Ocurrió un error inesperado: " + str(e)}
+            elif attempt == max_attempts:
+                return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
+            else:
+                time.sleep(7)
 
 def add_cmd(comando):
     if len(comando) >= 3:
