@@ -2,8 +2,13 @@ Pasos para hacer un escaneo simple
 
 \scan www.google.com
 \list
-\add 1 [otra herramienta] contenido obtenido
+\add 1 [otra herramienta] contenido obtenido (esto es opcional)
 \name 1 Mi nombre
 \company Nombre de la empresa
 \result 1
 \print 1
+
+Pasos para añadir un comando
+
+\add_cmd nmap -p1-1200 $ip
+

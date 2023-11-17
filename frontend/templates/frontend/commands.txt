@@ -51,5 +51,5 @@ Ejemplo: \company 17 Meta Inc.
 Ejemplo: \help
 
 <b>\clear:</b>    Este comando limpiara la pantalla.
-Ejemplo: \help
+Ejemplo: \clear
 
