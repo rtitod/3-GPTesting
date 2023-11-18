@@ -562,7 +562,7 @@ def result(comando):
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
                             print("one")
-                            respuesta_fragmento
+                            print(respuesta_fragmento)
                             respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
