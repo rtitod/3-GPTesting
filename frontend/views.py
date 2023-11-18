@@ -547,16 +547,37 @@ def result(comando):
                 existe_contenedor_lleno = False
                 result_context_summary.clear()
                 result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                respuesta_fragmento=""
+                respuesta_parcial=""
                 respuesta_completa=""
+                counter=0
                 for atributo in respuesta_atributos_ordenados:
                     if getattr(objeto, atributo):
                         respuesta=get_model_response(result_context_summary, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        respuesta_completa=respuesta_completa + respuesta
+                        counter = counter + 1
+                        respuesta_fragmento=respuesta_fragmento + respuesta
+                        if counter == 3:
+                            result_context_summary.clear()
+                            result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                            respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
+                            if isinstance(respuesta, dict) and "error" in respuesta:
+                                raise MyCustomError(respuesta["error"])
+                            respuesta_completa=respuesta_completa + respuesta_parcial
+                            result_context_summary.clear()
+                            result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                            counter = 0
                         time.sleep(17)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
+                    if counter < 3 and counter > 0 :
+                        result_context_summary.clear()
+                        result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                        respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
+                        if isinstance(respuesta, dict) and "error" in respuesta:
+                            raise MyCustomError(respuesta["error"])
+                        respuesta_completa=respuesta_completa + respuesta_parcial
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + respuesta_completa)
