@@ -297,7 +297,8 @@ def scan(comando):
                         salida = ejecutar_comando(linea_de_comando)
                         salida = "[" + linea_de_comando + "]:\n" + salida
                         setattr(registro_ip, f"contenedor{i}", salida)
-                        scan_context = copy.deepcopy(scan_context_original)
+                        scan_context.clear()
+                        scan_context.extend(copy.deepcopy(scan_context_original))
                         respuesta = get_model_response(scan_context, scan_context_original, salida)
                         for mensaje in scan_context:
                             print(f"{mensaje['role']}: {mensaje['content']}")
@@ -365,7 +366,8 @@ def add(comando):
                         if not getattr(objeto, atributo):
                             salida = "[" + coincidencias[0][0] + "]" + ":\n" + coincidencias[0][1]
                             setattr(objeto, atributo, salida)
-                            add_context = copy.deepcopy(add_context_original)
+                            add_context.clear()
+                            add_context.extend(copy.deepcopy(add_context_original))
                             respuesta = get_model_response(add_context, add_context_original, salida)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
@@ -532,7 +534,8 @@ def result(comando):
                 respuesta_atributos = [nombre_atributo for nombre_atributo in dir(objeto) if nombre_atributo.startswith("respuesta")]
                 respuesta_atributos_ordenados = sorted(respuesta_atributos, key=lambda x: int(x.lstrip("respuesta")))
                 existe_contenedor_lleno = False
-                result_context_summary = copy.deepcopy(result_context_summary_original)
+                result_context_summary.clear()
+                result_context_summary.extend(copy.deepcopy(result_context_summary_original))
                 for atributo in respuesta_atributos_ordenados:
                     if getattr(objeto, atributo):
                         respuesta=get_model_response(result_context_summary, result_context_summary_original, getattr(objeto, atributo))
@@ -541,7 +544,8 @@ def result(comando):
                         time.sleep(17)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
-                    result_context_other = copy.deepcopy(result_context_other_original)
+                    result_context_other.clear()
+                    result_context_other.extend(copy.deepcopy(result_context_other_original))
                     resultado = get_model_response(result_context_other, result_context_other_original, "Cuál es tu interpretación como experto de todo el texto introducido previamente?")
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
