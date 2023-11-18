@@ -28,10 +28,13 @@ scan_context_original = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar el texto que te pase"}
             ]
 add_context_original = [{"role": "system",
-               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar el texto que te pase. En maximo 300 caracteres"}
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar el texto que te pase."}
             ]
 result_context_summary_original = [{"role": "system",
-               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar de forma conjunta cada texto que te pase"}
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a sintetizar este texto."}
+            ]
+result_context_mix_original = [{"role": "system",
+               "content": "Tu eres un asistente experto en seguridad informática y pentesting. Quiero que sintetizes estas 3 o menos informaciones de pentesting. sin omitir ninguna y en diferentes parrafos"}
             ]
 result_context_other_original = [{"role": "system",
                "content": "Tu eres un asistente experto en seguridad informática y pentesting. Vas a interpretar cada texto que te pase"}
@@ -41,6 +44,7 @@ chat_context = copy.deepcopy(chat_context_original)
 scan_context = copy.deepcopy(scan_context_original)
 add_context = copy.deepcopy(add_context_original)
 result_context_summary = copy.deepcopy(result_context_summary_original)
+result_context_mix = copy.deepcopy(result_context_mix_original)
 result_context_other = copy.deepcopy(result_context_other_original)
 
 nombre_defecto="3GPTesting"
@@ -381,7 +385,7 @@ def add(comando):
                                 respuesta = get_model_response(add_context, parte)
                                 if isinstance(respuesta, dict) and "error" in respuesta:
                                     raise MyCustomError(respuesta["error"])
-                                respuesta_completa=respuesta_completa + respuesta
+                                respuesta_completa=respuesta_completa + '\n' + respuesta
                             numero = atributo.lstrip("contenedor")
                             setattr(objeto, "respuesta" + numero, respuesta_completa)
                             objeto.save()
@@ -557,16 +561,16 @@ def result(comando):
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
                         counter = counter + 1
-                        respuesta_fragmento=respuesta_fragmento + respuesta
+                        respuesta_fragmento=respuesta_fragmento + '\n' + respuesta
                         if counter == 3:
-                            result_context_summary.clear()
-                            result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                            result_context_mix.clear()
+                            result_context_mix.extend(copy.deepcopy(result_context_mix_original))
                             print("one")
                             print(respuesta_fragmento)
-                            respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
+                            respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
-                            respuesta_completa=respuesta_completa + respuesta_parcial
+                            respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
                             counter = 0
@@ -574,14 +578,14 @@ def result(comando):
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     if counter < 3 and counter > 0 :
-                        result_context_summary.clear()
-                        result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                        result_context_mix.clear()
+                        result_context_mix.extend(copy.deepcopy(result_context_mix_original))
                         print("two")
                         print(respuesta_fragmento)
-                        respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
+                        respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        respuesta_completa=respuesta_completa + respuesta_parcial
+                        respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + respuesta_completa)
