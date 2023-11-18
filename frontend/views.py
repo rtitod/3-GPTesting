@@ -310,7 +310,7 @@ def scan(comando):
                             respuesta = get_model_response(scan_context, parte)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
-                            respuesta_completa=respuesta_completa + '\n' + respuesta
+                            respuesta_completa=respuesta_completa + respuesta
                         setattr(registro_ip, f"respuesta{i}", respuesta_completa)
                         time.sleep(7)
                     registro_ip.save()
@@ -381,7 +381,7 @@ def add(comando):
                                 respuesta = get_model_response(add_context, parte)
                                 if isinstance(respuesta, dict) and "error" in respuesta:
                                     raise MyCustomError(respuesta["error"])
-                                respuesta_completa=respuesta_completa + '\n' + respuesta
+                                respuesta_completa=respuesta_completa + respuesta
                             numero = atributo.lstrip("contenedor")
                             setattr(objeto, "respuesta" + numero, respuesta_completa)
                             objeto.save()
@@ -547,25 +547,33 @@ def result(comando):
                 existe_contenedor_lleno = False
                 result_context_summary.clear()
                 result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                respuesta_completa=""
                 for atributo in respuesta_atributos_ordenados:
                     if getattr(objeto, atributo):
                         respuesta=get_model_response(result_context_summary, getattr(objeto, atributo))
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
+                        respuesta_completa=respuesta_completa + respuesta
                         time.sleep(17)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
-                    resultado = get_model_response(result_context_summary, "Cuál es tu interpretación como experto de todo el texto introducido previamente?")
+                    result_context_other.clear()
+                    result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + respuesta_completa)
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
                     time.sleep(17)
-                    resumen = get_model_response(result_context_summary, "resume este texto en menos de 300 letras : ")
+                    result_context_other.clear()
+                    result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + resultado)
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
                     time.sleep(17)
-                    recomendaciones = get_model_response(result_context_summary, "dame recomendaciones de seguridad informática en base a todo lo que me dijistes")
+                    result_context_other.clear()
+                    result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + respuesta_completa)
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
