@@ -561,6 +561,8 @@ def result(comando):
                         if counter == 3:
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                            print("one")
+                            respuesta_fragmento
                             respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
@@ -574,6 +576,8 @@ def result(comando):
                     if counter < 3 and counter > 0 :
                         result_context_summary.clear()
                         result_context_summary.extend(copy.deepcopy(result_context_summary_original))
+                        print("two")
+                        print(respuesta_fragmento)
                         respuesta_parcial=get_model_response(result_context_summary, respuesta_fragmento)
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
