@@ -615,7 +615,7 @@ def result(comando):
                 else:
                     response_content = "Todos los contenedores están vacíos"
             except Exception as e:
-                response_content = "Ocurrió un error inesperado: " +str(e)
+                response_content = "Ocurrió un error inesperado en result: " +str(e)
     else:
         response_content = "Uso: \\result id_del_scaneo" 
     return response_content
