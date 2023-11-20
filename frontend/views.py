@@ -565,6 +565,7 @@ def result(comando):
                         counter = counter + 1
                         respuesta_fragmento=respuesta_fragmento + '\n' + respuesta
                         if counter == 3:
+                            time.sleep(10)
                             result_context_mix.clear()
                             result_context_mix.extend(copy.deepcopy(result_context_mix_original))
                             print("procesando fragmento de 3 respuestas")
