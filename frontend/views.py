@@ -191,7 +191,7 @@ def get_model_response(conversation, user_message, max_attempts=6):
             elif attempt == max_attempts:
                 return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
             else:
-                time.sleep(7)
+                time.sleep(10)
 
 def truncate_to_1000_words(input_string):
     words = input_string.split()
@@ -574,7 +574,7 @@ def result(comando):
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
                             counter = 0
-                        time.sleep(17)
+                        time.sleep(10)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     if counter < 3 and counter > 0 :
@@ -592,21 +592,21 @@ def result(comando):
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
-                    time.sleep(17)
+                    time.sleep(10)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + resultado)
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
-                    time.sleep(17)
+                    time.sleep(10)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + respuesta_completa)
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
-                    time.sleep(17)
+                    time.sleep(10)
                     objeto.save()
                     response_content = "Se analizaron las respuestas y se guardaron el resultado, el resumen y las recomendaciones."
                 else:
