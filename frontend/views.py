@@ -586,7 +586,7 @@ def result(comando):
                         print(respuesta_fragmento)
                         respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                         if isinstance(respuesta, dict) and "error" in respuesta:
-                            raise MyCustomError(respuesta["error"])
+                            raise MyCustomError(respuesta_parcial["error"])
                         respuesta_completa=str(respuesta_completa) + '\n' + str(respuesta_parcial)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
