@@ -567,7 +567,7 @@ def result(comando):
                         if counter == 3:
                             result_context_mix.clear()
                             result_context_mix.extend(copy.deepcopy(result_context_mix_original))
-                            print("one")
+                            print("procesando fragmento de 3 respuestas")
                             print(respuesta_fragmento)
                             respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                             if isinstance(respuesta, dict) and "error" in respuesta:
@@ -580,7 +580,8 @@ def result(comando):
                         time.sleep(10)
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
-                    #if counter < 3 and counter > 0 :
+                    if counter < 3 and counter > 0 :
+                        print("aun hay material. Fragmento de 2 o menos")
                         #result_context_mix.clear()
                         #result_context_mix.extend(copy.deepcopy(result_context_mix_original))
                         #print("two")
@@ -591,6 +592,7 @@ def result(comando):
                         #respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    print("generando resultado general")
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
@@ -598,6 +600,7 @@ def result(comando):
                     time.sleep(10)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    print("generando resumen")
                     resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
@@ -605,6 +608,7 @@ def result(comando):
                     time.sleep(10)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    print("generando recomendaciones")
                     recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
