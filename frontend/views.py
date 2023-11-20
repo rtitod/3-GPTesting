@@ -589,26 +589,26 @@ def result(comando):
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta_parcial["error"])
                         respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
-                    result_context_other.clear()
-                    result_context_other.extend(copy.deepcopy(result_context_other_original))
-                    resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
-                    if isinstance(resultado, dict) and "error" in resultado:
-                        raise MyCustomError(resultado["error"])
-                    setattr(objeto, "resultado", resultado)
+                    #result_context_other.clear()
+                    #result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    #resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
+                    #if isinstance(resultado, dict) and "error" in resultado:
+                    #    raise MyCustomError(resultado["error"])
+                    #setattr(objeto, "resultado", resultado)
                     time.sleep(10)
-                    result_context_other.clear()
-                    result_context_other.extend(copy.deepcopy(result_context_other_original))
-                    resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
-                    if isinstance(resumen, dict) and "error" in resumen:
-                            raise MyCustomError(resumen["error"])
-                    setattr(objeto, "resumen", resumen)
+                    #result_context_other.clear()
+                    #result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    #resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
+                    #if isinstance(resumen, dict) and "error" in resumen:
+                    #        raise MyCustomError(resumen["error"])
+                    #setattr(objeto, "resumen", resumen)
                     time.sleep(10)
-                    result_context_other.clear()
-                    result_context_other.extend(copy.deepcopy(result_context_other_original))
-                    recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
-                    if isinstance(recomendaciones, dict) and "error" in recomendaciones:
-                            raise MyCustomError(recomendaciones["error"])
-                    setattr(objeto, "recomendaciones", recomendaciones)
+                    #result_context_other.clear()
+                    #result_context_other.extend(copy.deepcopy(result_context_other_original))
+                    #recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
+                    #if isinstance(recomendaciones, dict) and "error" in recomendaciones:
+                    #        raise MyCustomError(recomendaciones["error"])
+                    #setattr(objeto, "recomendaciones", recomendaciones)
                     time.sleep(10)
                     objeto.save()
                     response_content = "Se analizaron las respuestas y se guardaron el resultado, el resumen y las recomendaciones."
