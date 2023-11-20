@@ -170,7 +170,7 @@ def ejecutar_comando(comando_str):
     except Exception as e:
         return f"Ocurrió un error inesperado: \n {str(e)}"
 
-def get_model_response(conversation, user_message, max_attempts=6):
+def get_model_response(conversation, user_message, max_attempts=8):
     #user_message = truncate_to_1000_words(user_message)
     conversation.append({"role": "user", "content": user_message})
     for attempt in range(1, max_attempts + 1):
@@ -178,7 +178,7 @@ def get_model_response(conversation, user_message, max_attempts=6):
             response = openai.ChatCompletion.create(
                 model=modelo,
                 messages=conversation,
-                request_timeout=60,
+                request_timeout=80,
             )
             response_from_api = response['choices'][0]['message']['content']
             conversation.append({"role": "system", "content": response_from_api})
@@ -569,11 +569,9 @@ def result(comando):
                             result_context_mix.clear()
                             result_context_mix.extend(copy.deepcopy(result_context_mix_original))
                             print("procesando fragmento de 3 respuestas")
-                            print(respuesta_fragmento)
                             respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
-                            print(str(respuesta_parcial))
-                            if isinstance(respuesta, dict) and "error" in respuesta:
-                                raise MyCustomError(respuesta["error"])
+                            if isinstance(respuesta_parcial, dict) and "error" in respuesta_parcial:
+                                raise MyCustomError(respuesta_parcial["error"])
                             respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
@@ -584,19 +582,16 @@ def result(comando):
                 if existe_contenedor_lleno == True:
                     if counter < 3 and counter > 0 :
                         print("aun hay material. Fragmento de 2 o menos")
-                        #result_context_mix.clear()
-                        #result_context_mix.extend(copy.deepcopy(result_context_mix_original))
-                        #print("two")
-                        #print(respuesta_fragmento)
-                        #respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
-                        #if isinstance(respuesta, dict) and "error" in respuesta:
-                        #    raise MyCustomError(respuesta_parcial["error"])
-                        #respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
+                        result_context_mix.clear()
+                        result_context_mix.extend(copy.deepcopy(result_context_mix_original))
+                        respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
+                        if isinstance(respuesta_parcial, dict) and "error" in respuesta_parcial:
+                            raise MyCustomError(respuesta_parcial["error"])
+                        respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resultado general")
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
-                    print(str(resultado))
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
@@ -605,7 +600,6 @@ def result(comando):
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resumen")
                     resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
-                    print(str(resumen))
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
@@ -614,7 +608,6 @@ def result(comando):
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando recomendaciones")
                     recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
-                    print(str(recomendaciones))
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
