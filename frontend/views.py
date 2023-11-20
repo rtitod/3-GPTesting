@@ -319,6 +319,7 @@ def scan(comando):
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
                             respuesta_completa=respuesta_completa + respuesta
+                            time.sleep(1)
                         setattr(registro_ip, f"respuesta{i}", respuesta_completa)
                         time.sleep(7)
                     registro_ip.save()
