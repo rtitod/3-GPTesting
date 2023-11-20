@@ -188,6 +188,8 @@ def get_model_response(conversation, user_message, max_attempts=6):
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif 'Request too large' in str(e) :
                 return {"error": "Ocurrió un error inesperado: " + str(e)}
+            elif 'Incorrect API key provided' in str(e) :
+                return {"error": "Ocurrió un error inesperado: " + str(e)}
             elif attempt == max_attempts:
                 return {"error": f"Ocurrió un error inesperado después de {max_attempts} intentos: {str(e)}"}
             else:
