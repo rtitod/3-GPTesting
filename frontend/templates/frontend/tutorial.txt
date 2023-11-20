@@ -12,3 +12,15 @@ Pasos para añadir un comando
 
 \add_cmd nmap -p1-1200 $ip
 
+Pasos para borrar un comando
+
+\del_cmd 1
+
+Pasos para listar comandos
+
+\list_cmd
+
+Ayuda
+
+\help
+
