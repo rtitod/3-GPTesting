@@ -313,6 +313,7 @@ def scan(comando):
                         for parte in partes_de_la_salida:
                             scan_context.clear()
                             scan_context.extend(copy.deepcopy(scan_context_original))
+                            print("generando respuesta de la salida del comando")
                             respuesta = get_model_response(scan_context, parte)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
@@ -581,9 +582,9 @@ def result(comando):
                         existe_contenedor_lleno = True
                 if existe_contenedor_lleno == True:
                     if counter < 3 and counter > 0 :
-                        print("aun hay material. Fragmento de 2 o menos")
                         result_context_mix.clear()
                         result_context_mix.extend(copy.deepcopy(result_context_mix_original))
+                        print("aun hay material. Fragmento de 2 o menos")
                         respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                         if isinstance(respuesta_parcial, dict) and "error" in respuesta_parcial:
                             raise MyCustomError(respuesta_parcial["error"])
