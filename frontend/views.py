@@ -592,10 +592,11 @@ def result(comando):
                         if isinstance(respuesta_parcial, dict) and "error" in respuesta_parcial:
                             raise MyCustomError(respuesta_parcial["error"])
                         respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
+                    print(str(respuesta_completa))
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resultado general")
-                    resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
+                    resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + respuesta_completa)
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
@@ -603,7 +604,7 @@ def result(comando):
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resumen")
-                    resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
+                    resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + resultado)
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
@@ -611,7 +612,7 @@ def result(comando):
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando recomendaciones")
-                    recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
+                    recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + respuesta_completa)
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
