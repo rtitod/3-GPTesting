@@ -572,7 +572,7 @@ def result(comando):
                             respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
-                            respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
+                            respuesta_completa=str(respuesta_completa) + '\n' + str(respuesta_parcial)
                             result_context_summary.clear()
                             result_context_summary.extend(copy.deepcopy(result_context_summary_original))
                             counter = 0
@@ -587,7 +587,7 @@ def result(comando):
                         respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
                         if isinstance(respuesta, dict) and "error" in respuesta:
                             raise MyCustomError(respuesta["error"])
-                        respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
+                        respuesta_completa=str(respuesta_completa) + '\n' + str(respuesta_parcial)
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + respuesta_completa)
