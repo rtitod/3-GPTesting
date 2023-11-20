@@ -570,6 +570,7 @@ def result(comando):
                             print("procesando fragmento de 3 respuestas")
                             print(respuesta_fragmento)
                             respuesta_parcial=get_model_response(result_context_mix, respuesta_fragmento)
+                            print(str(respuesta_parcial))
                             if isinstance(respuesta, dict) and "error" in respuesta:
                                 raise MyCustomError(respuesta["error"])
                             respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
@@ -594,6 +595,7 @@ def result(comando):
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resultado general")
                     resultado = get_model_response(result_context_other, "Cuál es tu interpretación como experto de este texto? : " + str(respuesta_completa))
+                    print(str(resultado))
                     if isinstance(resultado, dict) and "error" in resultado:
                         raise MyCustomError(resultado["error"])
                     setattr(objeto, "resultado", resultado)
@@ -602,6 +604,7 @@ def result(comando):
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resumen")
                     resumen = get_model_response(result_context_other, "resume este texto en menos de 300 letras : " + str(resultado))
+                    print(str(resumen))
                     if isinstance(resumen, dict) and "error" in resumen:
                             raise MyCustomError(resumen["error"])
                     setattr(objeto, "resumen", resumen)
@@ -610,6 +613,7 @@ def result(comando):
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando recomendaciones")
                     recomendaciones = get_model_response(result_context_other, "dame recomendaciones de seguridad informática en base a esto : " + str(respuesta_completa))
+                    print(str(recomendaciones))
                     if isinstance(recomendaciones, dict) and "error" in recomendaciones:
                             raise MyCustomError(recomendaciones["error"])
                     setattr(objeto, "recomendaciones", recomendaciones)
