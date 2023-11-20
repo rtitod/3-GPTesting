@@ -96,6 +96,7 @@ def enviar_mensaje(request):
                 else:
                     response_content = "Comando no reconocido"
             else:
+                print("generando respuesta para chat")
                 response_content = get_model_response(chat_context, contenido, )
                 if isinstance(response_content, dict) and "error" in response_content:
                     if 'However, your messages resulted in' in response_content['error'] or 'Request too large' in response_content['error']:
@@ -386,6 +387,7 @@ def add(comando):
                                 add_context.clear()
                                 add_context.extend(copy.deepcopy(add_context_original))
                                 respuesta = get_model_response(add_context, parte)
+                                print("generando respuesta de la entrada personalizada")
                                 if isinstance(respuesta, dict) and "error" in respuesta:
                                     raise MyCustomError(respuesta["error"])
                                 respuesta_completa=respuesta_completa + '\n' + respuesta
