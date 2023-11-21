@@ -387,8 +387,8 @@ def add(comando):
                             for parte in partes_de_la_salida:
                                 add_context.clear()
                                 add_context.extend(copy.deepcopy(add_context_original))
-                                respuesta = get_model_response(add_context, parte)
                                 print("generando respuesta de la entrada personalizada")
+                                respuesta = get_model_response(add_context, parte)
                                 if isinstance(respuesta, dict) and "error" in respuesta:
                                     raise MyCustomError(respuesta["error"])
                                 respuesta_completa=respuesta_completa + '\n' + respuesta
@@ -432,6 +432,9 @@ def print_(comando):
                 for elemento in contenedor_printing_atributos_ordenados:
                     if getattr(objeto_for_printing, elemento):
                         texto_a_almacenar = getattr(objeto_for_printing, elemento)
+                        #correccion simple
+                        if texto_a_almacenar.startswith('\n'):
+                            texto_a_almacenar = texto_a_almacenar[1:]
                         lineas = html.escape(texto_a_almacenar).split("\n")
                         if lineas:
                             lineas[0] = "<u><b>" + lineas[0] + "</b></u><br>"
@@ -442,6 +445,9 @@ def print_(comando):
                 for elemento in respuesta_printing_atributos_ordenados:
                     if getattr(objeto_for_printing, elemento):
                         texto_a_almacenar = getattr(objeto_for_printing, elemento)
+                        #correccion simple
+                        if texto_a_almacenar.startswith('\n'):
+                            texto_a_almacenar = texto_a_almacenar[1:]
                         lineas = html.escape(texto_a_almacenar).split("\n")
                         if lineas:
                             lineas[0] = "<b>" + lineas[0] + "</b>"
