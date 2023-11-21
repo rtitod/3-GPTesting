@@ -592,7 +592,6 @@ def result(comando):
                         if isinstance(respuesta_parcial, dict) and "error" in respuesta_parcial:
                             raise MyCustomError(respuesta_parcial["error"])
                         respuesta_completa=respuesta_completa + '\n' + respuesta_parcial
-                    print(str(respuesta_completa))
                     result_context_other.clear()
                     result_context_other.extend(copy.deepcopy(result_context_other_original))
                     print("generando resultado general")
