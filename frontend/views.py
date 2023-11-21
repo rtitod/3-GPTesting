@@ -456,7 +456,14 @@ def print_(comando):
                         contenido_respuestas.append(texto_a_almacenar)
                 
                 contenedores_y_respuestas = zip(contenido_contenedores, contenido_respuestas)
-                
+                #permite imprimir sin resultados
+                if objeto_for_printing.resumen is None:
+                    objeto_for_printing.resumen = " "
+                if objeto_for_printing.resultado is None:
+                    objeto_for_printing.resultado = " "
+                if objeto_for_printing.recomendaciones is None:
+                    objeto_for_printing.recomendaciones = " "
+
                 context = {
                     'nombre': html.escape(objeto_for_printing.nombre),
                     'empresa': html.escape(objeto_for_printing.empresa),
