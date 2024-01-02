@@ -6,6 +6,7 @@
     <title>3GPTesting</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
+
 </head>
 <body>
     <div id="all_options">
@@ -33,6 +34,10 @@
     <div class="container">
         <div id="chat" class="main-content">
             <div id="mensajes"></div>
+            <div id="loading-icon" style="display: none;">
+                <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/circular_progress_indicator_small.gif" 
+                alt="Loading..." style="width: 40%; height: 40%;"> 
+            </div>
             <textarea id="mensaje" rows="6" cols="120"></textarea>
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             <div id="loading"></div>
@@ -108,6 +113,13 @@
                 $('#fontSize').val() , $('#fontcolor').val(),nuevotutorialbgcolor );
             });
             
+            function mostrarLoading() {
+                $('#loading-icon').show();
+            }
+
+            function ocultarLoading() {
+                $('#loading-icon').hide();
+            }
 
             function cargarMensajes() {
                $.ajax({
@@ -143,6 +155,7 @@
                 var contenido = $('#mensaje').val();
 
                 if (contenido.trim() !== '') {
+                    mostrarLoading(); // Mostrar el icono de carga
                     $('#enviar').prop('disabled', true);
                     $('#mensaje').val('Procesando, espere por favor. Si la respuesta demora bastante, recarge esta página.');
                     $('#mensaje').prop('disabled', true); 
@@ -155,6 +168,7 @@
                     },
                     success: function(data) {
                         cargarMensajes();
+                        ocultarLoading(); // Ocultar el icono de carga después de la respuesta
                         $('#mensaje').val(''); 
                     }
                 });
@@ -163,6 +177,5 @@
             cargarMensajes();
         });
     </script>
-    
 </body>
 </html>
