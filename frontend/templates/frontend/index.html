@@ -8,6 +8,28 @@
     <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
 </head>
 <body>
+    <div id="all_options">
+        <div id="options_a">
+            <label for="color">Color de fondo:</label>
+            <input type="color" id="color" value="#f0f0f0">
+        
+            <label for="fontSize">Tamaño de fuente:</label>
+            <select id="fontSize">
+                <option value="16px">Pequeño</option>
+                <option value="20px">Mediano</option>
+                <option value="24px">Grande</option>
+                <option value="28px">Muy Grande</option>
+            </select>
+        </div>
+        <div id="options_b">
+            <label for="color">Color de fuente:</label>
+            <input type="color" id="fontcolor" value="#000000">
+
+            <label for="color">Color de fondo del tutorial:</label>
+            <input type="color" id="tutorialbgcolor" value="#ffffff">
+        </div>
+    </div>
+
     <div class="container">
         <div id="chat" class="main-content">
             <div id="mensajes"></div>
@@ -30,6 +52,62 @@
 
         $(document).ready(function() {
             var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+
+            $('#color').val('#f0f0f0');
+            $('#fontSize').val($('#fontSize option:first').val());
+            $('#fontcolor').val('#000000');
+            $('#tutorialbgcolor').val('#ffffff');
+
+            // Función para aplicar cambios de estilo
+            function aplicarEstilos(color, fontSize, fontcolor, tutorialbgcolor) {
+                $('body, html').css({
+                    'background-color': color,
+                    'font-size': fontSize,
+                    'color': fontcolor
+                });
+                $('.floating-window').css({
+                    'background-color': tutorialbgcolor
+                });
+
+                // Modificar el tamaño del botón y del select
+                $('#enviar, #fontSize').css('font-size', fontSize);
+
+
+                $('#mensaje').css({
+                    'font-size': fontSize,
+                    'width': '100%'
+                });
+            }
+
+            // Capturar cambios en el color de fondo
+            $('#color').change(function() {
+                var nuevoColor = $(this).val();
+                aplicarEstilos(nuevoColor, 
+                $('#fontSize').val(), $('#fontcolor').val(), $('#tutorialbgcolor').val());
+            });
+
+            // Capturar cambios en el tamaño de fuente
+            $('#fontSize').change(function() {
+                var nuevoFontSize = $(this).val();
+                aplicarEstilos($('#color').val(), 
+                nuevoFontSize, $('#fontcolor').val(), $('#tutorialbgcolor').val());
+
+            });
+
+            // Capturar cambios en el color de fuente
+            $('#fontcolor').change(function() {
+                var nuevoFontColor = $(this).val();
+                aplicarEstilos($('#color').val(), 
+                $('#fontSize').val() , nuevoFontColor, $('#tutorialbgcolor').val());
+            });
+
+            // Capturar cambios en el color de fondo del tutorial
+            $('#tutorialbgcolor').change(function() {
+                var nuevotutorialbgcolor = $(this).val();
+                aplicarEstilos($('#color').val(), 
+                $('#fontSize').val() , $('#fontcolor').val(),nuevotutorialbgcolor );
+            });
+            
 
             function cargarMensajes() {
                $.ajax({

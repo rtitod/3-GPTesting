@@ -25,6 +25,9 @@ body, html {
     right: 20px;
     top: 20px;
     z-index: 1;
+    max-height: 200;
+    max-height: 80vh; /* Altura máxima del 80% del viewport height */
+    overflow-y: auto; /* Añade scrollbar vertical si es necesario */
 }
 
 .main-content h1,
