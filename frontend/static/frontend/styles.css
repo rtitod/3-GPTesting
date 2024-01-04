@@ -6,6 +6,16 @@ body, html {
     background-color: #f0f0f0; 
 }
 
+table {
+    margin-top: 20px; 
+    margin-left: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-width: 10px; /* Grosor del borde */
+    border-style: solid; /* Estilo del borde */
+    border-color: #fff; /* Color del borde */
+}
+
 .container {
     display: flex;
     min-width: 100%

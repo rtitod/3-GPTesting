@@ -9,8 +9,35 @@
 
 </head>
 <body>
-    <div id="all_options">
-        <div id="options_a">
+    <div id="all_options" >
+        <table>
+            <tr>
+                <td>
+                    <label for="color">Color de fondo:</label>
+                    <input type="color" id="color" value="#f0f0f0">
+                </td>
+                <td>
+                    <label for="fontSize">Tamaño de fuente:</label>
+                    <select id="fontSize">
+                        <option value="16px">Pequeño</option>
+                        <option value="22px">Mediano</option>
+                        <option value="28px">Grande</option>
+                        <option value="34px">Muy Grande</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="color">Color de fuente:</label>
+                    <input type="color" id="fontcolor" value="#000000">
+                </td>
+                <td>
+                    <label for="color">Color de fondo del tutorial:</label>
+                    <input type="color" id="tutorialbgcolor" value="#ffffff">
+                </td>
+            </tr>
+        </table>
+        <!--<div id="options_a">
             <label for="color">Color de fondo:</label>
             <input type="color" id="color" value="#f0f0f0">
         
@@ -28,7 +55,7 @@
 
             <label for="color">Color de fondo del tutorial:</label>
             <input type="color" id="tutorialbgcolor" value="#ffffff">
-        </div>
+        </div>-->
     </div>
 
     <div class="container">
@@ -72,6 +99,11 @@
                 });
                 $('.floating-window').css({
                     'background-color': tutorialbgcolor
+                });
+
+                $('table').css({
+                    'background-color': tutorialbgcolor,
+                    'border-color': tutorialbgcolor
                 });
 
                 // Modificar el tamaño del botón y del select
