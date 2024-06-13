@@ -62,7 +62,7 @@
         <div id="chat" class="main-content">
             <div id="mensajes"></div>
             <div id="loading-icon" style="display: none;">
-                <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/circular_progress_indicator_small.gif" 
+                <img src="{% static 'frontend/circular_progress_indicator_small.gif' %}" 
                 alt="Loading..." style="width: 40%; height: 40%;"> 
             </div>
             <textarea id="mensaje" rows="6" cols="120"></textarea>
@@ -177,7 +177,7 @@
             });
 
             $('#mensaje').keydown(function(e) {
-                if (e.key === "Enter") {
+                if (e.key === "Enter"  && !e.shiftKey) {
                     e.preventDefault(); // Evitar que el formulario se envíe automáticamente
                     enviarMensaje();
                 }
